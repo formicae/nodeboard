@@ -1,9 +1,14 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+const app = express();
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+app.engine('html', require('ejs').renderFile);
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+app.get('/', (req, res, next) => {
+   res.render('mongoose');
 });
 
-module.exports = router;
+app.listen(5000, () => {
+    console.log('nodeboard server is running!');
+});
