@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+<h2>Welcome to <%= userid %>'s board!</h2>
+<table width="100%" border="1">
+    <tr>
+        <th>number</th>
+        <th>title</th>
+        <th>text</th>
+        <th>EDIT</th>
+        <th>DELETE</th>
+    </tr>
+    <% data.forEach(function (article) {%>
+        <tr>
+            <td><%= article.number %></td>
+            <td><%= article.title %></td>
+            <td><%= article.content %></td>
+            <td>
+                <input type="button" id="edit<%=userid%><%=article.number%>" value="edit">
+            </td>
+            <td>
+                <input type="button" id="delete<%=userid%><%=article.number%>" value="delete">
+            </td>
+        </tr>
+    <% }); %>
+</table>
+<input type="button" id="create" value="create">
+<form action="/user" method="get">
+    <input type="button" id="goback" name="goback" value="go back to main page">
+</form>
+<script>
+    function ajaxFunction(elementId, actiontype){
+        document.getElementById(elementId).addEventListener('click', () => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', '/board', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState > 3 && xhr.status==200) {
+                    document.body.innerHTML = xhr.responseText;
+                }
+            };
+            xhr.responseType = 'text';
+            xhr.setRequestHeader('Content-type','application/json');
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.setRequestHeader('actiontype',actiontype);
+            xhr.setRequestHeader('actionstatus', 'start');
+            xhr.send();
+        });
+    }
+    ajaxFunction('create', 'create');
+</script>
+</body>
+</html>
+

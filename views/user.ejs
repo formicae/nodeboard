@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+    <h1><%= title %></h1>
+    <p>Welcome to User Page!</p>
+    <tr>
+        <h2>Hello <%=userid%> !</h2>
+    </tr>
+    <input type="button" id="logout" value="log out">
+    <form action="/board" method="get">
+        <input type="submit" id="boardpage" value="board page">
+    </form>
+    <script>
+        document.getElementById('logout').addEventListener('click', () => {
+            const data = {userid:'<%=userid%>', actiontype:'logout'};
+            const xhr = new XMLHttpRequest();
+            xhr.responseType = 'text';
+            xhr.addEventListener('load', () => {
+                window.history.pushState(data, 'title changed!', '/');
+                document.body.innerHTML = xhr.responseText;
+            });
+            xhr.open('POST', '/user', true);
+            xhr.setRequestHeader('Content-type','application/json');
+            xhr.send(JSON.stringify(data));
+        });
+    </script>
+</body>
+</html>
+

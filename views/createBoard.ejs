@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+    <h1><%= title %></h1>
+    <p>Create Article <%=userid%>!</p>
+    <table>
+        <tr>
+            <td><label>Title</label></td>
+            <td><input type="text" name="title" id="title"></td>
+        </tr>
+        <tr>
+            <td><label>Content</label></td>
+            <td><input type="text" name="content" id="content"></td>
+        </tr>
+    </table>
+    <input type="button" id="submitButton" value="Done">
+    <form action="/board" method="get">
+        <input type="submit" id="goback" value="go back to board">
+    </form>
+    <script>
+        document.getElementById('submitButton').addEventListener('click', () => {
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const data = {userid:'<%=userid%>', title:title, content:content, actiontype:'create', actionstatsu:'end'};
+            const xhr = new XMLHttpRequest();
+            xhr.responseType = 'text';
+            xhr.addEventListener('load', () => {
+                console.log(title, content);
+                console.log(xhr.responseText);
+                document.body.innerHTML = xhr.responseText;
+            });
+            xhr.open('POST', '/board/post', true);
+            xhr.setRequestHeader('Content-type','application/json');
+            xhr.send(JSON.stringify(data));
+        });
+    </script>
+</body>
+</html>
+

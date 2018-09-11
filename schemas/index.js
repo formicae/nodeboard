@@ -5,8 +5,11 @@ module.exports = () => {
         if (process.env.NODE_ENV !== 'production') {
             mongoose.set('debug', true);
         }
-        mongoose.connect('mongobd://127.0.0.1:27017/admin', {
+        mongoose.Promise = global.Promise;
+        mongoose.set('useCreateIndex', true)
+        mongoose.connect('mongodb://youngmo:Dldudah12!@127.0.0.1:27017/admin', {
             dbName:'nodejs',
+            useNewUrlParser : true,
         }, (err) => {
             if (err) {
                 console.log('Mongodb connection error!', err);
@@ -22,5 +25,6 @@ module.exports = () => {
         console.log('dis-connected! redirecting...');
     });
     require('./user');
-    require('./comment');
+    require('./board');
+    require('./ArticleNumber');
 };
