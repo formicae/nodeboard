@@ -32,10 +32,4 @@ boardSchema.methods.getUserBoard = function (userid) {
     mongoose.model('Board', boardSchema).find({userid:userid})
 };
 
-boardSchema.pre('save', function (next){
-    const article = this;
-    // update new article's number here
-});
-
-
 module.exports = mongoose.model('Board',boardSchema);

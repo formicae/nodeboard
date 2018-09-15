@@ -6,7 +6,7 @@ module.exports = () => {
             mongoose.set('debug', true);
         }
         mongoose.Promise = global.Promise;
-        mongoose.set('useCreateIndex', true)
+        mongoose.set('useCreateIndex', true);
         mongoose.connect('mongodb://youngmo:Dldudah12!@127.0.0.1:27017/admin', {
             dbName:'nodejs',
             useNewUrlParser : true,
@@ -26,5 +26,4 @@ module.exports = () => {
     });
     require('./user');
     require('./board');
-    require('./ArticleNumber');
 };

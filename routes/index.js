@@ -6,8 +6,6 @@ const passport = require('passport');
 const passportConfig = require('./passport');
 const session = require('express-session');
 const User = require('../schemas/user');
-const Board = require('../schemas/board');
-const ArticleNumber = require('../schemas/ArticleNumber');
 const connect = require('../schemas/index');
 connect();
 const MongoDBStore = require('connect-mongodb-session')(session);
@@ -46,7 +44,7 @@ const ensureAuthenticated = (req, res, next) => {
         req.session.prevUrl = 'authFail';
         res.redirect('/');
     }
-}
+};
 
 router.get('/', (req, res, next) => {
     if (req.session.prevUrl === 'signup') {
@@ -81,10 +79,6 @@ function uniqueUserid(userid, callback) {
         }).catch((err)=>{console.log('unique Userid error : ',err)});
 }
 
-function checkMaxArticleNum(userid, callback) {
-    Board.find({userid:userid})
-        .then()
-}
 
 router.get('/signup', (req, res, next) => {
     res.render('../views/signup', {title:'Make your ID here!'});

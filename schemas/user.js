@@ -24,6 +24,11 @@ const userSchema = new mongoose.Schema({
         index:true,
         default:Date.now,
     },
+    maxNumber:{
+        type:Number,
+        index:true,
+        default:0,
+    }
 },{collection:"users"});
 
 userSchema.index({'userid':1},{unique:true});
