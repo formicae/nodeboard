@@ -11,7 +11,7 @@
         <h2>Hello <%=userid%> !</h2>
     </tr>
     <tr>
-        <h5> Picture : </h5>
+        <h5 id="pictureInfo"> Picture : </h5>
         <img id="loadPicture" width="0" height="0">
     </tr>
     <form id="uploader" enctype="multipart/form-data" action="/user/upload" method="post">
@@ -24,11 +24,12 @@
     </form>
     <script>
         document.getElementById('loadbutton').addEventListener('click', () => {
-            const form = document.getElementById('uploader')
+            const form = document.getElementById('uploader');
             const formData = new FormData(form);
             const xhr = new XMLHttpRequest();
             xhr.addEventListener('load', () => {
                 console.log('ajax for upload done !');
+                document.getElementById('pictureInfo').innerHTML = 'Picture : ' + JSON.parse(xhr.responseText).filename;
                 document.getElementById('loadPicture').width = 250;
                 document.getElementById('loadPicture').height = 300;
                 document.getElementById('loadPicture').src = JSON.parse(xhr.responseText).filename;

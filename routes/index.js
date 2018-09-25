@@ -121,14 +121,12 @@ const upload = multer({
             callback(null, 'images/');
         },
         filename : function(req, file, callback) {
-            callback(null, file.fieldname + '_' + Date.now() + file.originalname);
+            callback(null, Date.now() + file.originalname);
         }
     }),
 });
 
 router.post('/user/upload', ensureAuthenticated, upload.single('inputImage'), (req, res, next) => {
-    console.log('upload request!');
-    console.log('file : ',req.file);
     res.send(req.file);
 });
 
