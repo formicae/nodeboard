@@ -10,11 +10,33 @@
     <tr>
         <h2>Hello <%=userid%> !</h2>
     </tr>
+    <tr>
+        <h5> Picture : </h5>
+        <img id="loadPicture" width="0" height="0">
+    </tr>
+    <form id="uploader" enctype="multipart/form-data" action="/user/upload" method="post">
+        <input type="file" name="inputImage" multiple />
+        <input type="button" name="submit" id="loadbutton" value="Upload"/>
+    </form>
     <input type="button" id="logout" value="log out">
     <form action="/board" method="get">
         <input type="submit" id="boardpage" value="board page">
     </form>
     <script>
+        document.getElementById('loadbutton').addEventListener('click', () => {
+            const form = document.getElementById('uploader')
+            const formData = new FormData(form);
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('load', () => {
+                console.log('ajax for upload done !');
+                document.getElementById('loadPicture').width = 250;
+                document.getElementById('loadPicture').height = 300;
+                document.getElementById('loadPicture').src = JSON.parse(xhr.responseText).filename;
+            });
+            xhr.open('post', '/user/upload', true);
+            xhr.send(formData);
+        });
+
         document.getElementById('logout').addEventListener('click', () => {
             const data = {userid:'<%=userid%>', actiontype:'logout'};
             const xhr = new XMLHttpRequest();

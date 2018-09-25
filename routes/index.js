@@ -3,6 +3,7 @@ const app = express();
 const router = express.Router();
 const bodyParser = require('body-parser');
 const passport = require('passport');
+const multer = require('multer');
 const passportConfig = require('./passport');
 const session = require('express-session');
 const User = require('../schemas/user');
@@ -112,6 +113,23 @@ router.post('/user', ensureAuthenticated, (req, res, next) => {
     req.session.prevUrl = 'logout';
     console.log('about to log out!');
     res.redirect('/');
+});
+
+const upload = multer({
+    storage : multer.diskStorage({
+        destination : function(req, file, callback) {
+            callback(null, 'images/');
+        },
+        filename : function(req, file, callback) {
+            callback(null, file.fieldname + '_' + Date.now() + file.originalname);
+        }
+    }),
+});
+
+router.post('/user/upload', ensureAuthenticated, upload.single('inputImage'), (req, res, next) => {
+    console.log('upload request!');
+    console.log('file : ',req.file);
+    res.send(req.file);
 });
 
 module.exports = router;
