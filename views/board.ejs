@@ -14,11 +14,12 @@
 <body>
 <div id="mainBoardPage" class="showPage">
     <h2>Welcome to <%= userid %>'s board!</h2>
-    <table id="boardTable" width="100%" border="1">
+    <table id="boardTable" width="100%" border="1" class="<%=userid%>">
         <tr>
             <th>number</th>
             <th>title</th>
             <th>text</th>
+            <th>detail</th>
             <th>EDIT</th>
             <th>DELETE</th>
         </tr>
@@ -27,6 +28,9 @@
                 <td><%= article.number %></td>
                 <td><%= article.title %></td>
                 <td><%= article.content %></td>
+                <td>
+                    <input type="button" id="detail<%=article.number%>" value="detail">
+                </td>
                 <td>
                     <input type="button" id="edit<%=article.number%>" value="edit">
                 </td>
@@ -41,6 +45,29 @@
         <input type="submit" id="goback" name="goback" value="go back to main page">
     </form>
 </div>
+<div id="articlePage" class="hidePage">
+    <table id="articleTable">
+        <tr>
+            <td><h5 id="articleTitle"></h5></td>
+        </tr>
+        <tr>
+            <td><h5 id="articleContent"></h5></td>
+        </tr>
+        <tr>
+            <td><label id="articleImageLabel"></label></td>
+            <img id="articleImage" width="0" height="0">
+        </tr>
+        <tr>
+            <td><input type="button" onclick="articleToEditPage()" value="edit contents"></td>
+        </tr>
+        <tr>
+            <td><input type="button" onclick="articleToDelete()" value="delete contents"></td>
+        </tr>
+        <tr>
+            <td><input type="button" onclick="showMainPage()" value="go back to main page"></td>
+        </tr>
+    </table>
+</div>
 <div id="createBoardPage" class="hidePage">
     <h1><%= title %></h1>
     <p>Create Article <%=userid%>!</p>
@@ -53,8 +80,18 @@
             <td><label>Content</label></td>
             <td><input type="text" id="createContent" name="content"></td>
         </tr>
+        <tr>
+            <td><label id="createImageLabel"></label></td>
+            <td><img id="createImage" width="0" height="0"></td>
+            <td>
+                <form id="createPageImageUpload" enctype="multipart/form-data" action="/board/upload" method="post">
+                    <input type="file" name="createPageInputImage" multiple />
+                    <input type="button" name="submit" id="createPageUpload" value="Upload"/>
+                </form>
+            </td>
+        </tr>
     </table>
-    <input type="submit" onclick="postCreateData()" value="Done">
+    <input type="submit" onclick="createAjax()" value="Done">
     <input type="submit" onclick="showMainPage()" value="go back to board">
 </div>
 <div id="editBoardPage" class="hidePage">
@@ -64,11 +101,11 @@
     <table id="editTable">
         <tr>
             <td><label>Previous Title</label></td>
-            <td><label id="prevTitleLabel">None</label></td>
+            <td><label id="editTitleLabel">None</label></td>
         </tr>
         <tr>
             <td><label>Previous content</label></td>
-            <td><label id="prevContentLabel">None</label></td>
+            <td><label id="editContentLabel">None</label></td>
         </tr>
         <tr>
             <td><label>Title</label></td>
@@ -78,8 +115,18 @@
             <td><label>Content</label></td>
             <td><input type="text" name="content" id="editContent"></td>
         </tr>
+        <tr>
+            <td><label id="editImageLabel"></label></td>
+            <td><img id="editImage" width="0" height="0"></td>
+        </tr>
+        <td>
+            <form id="editPageImageUpload" enctype="multipart/form-data" action="/board/upload" method="post">
+                <input type="file" name="editPageInputImage" multiple />
+                <input type="button" name="submit" id="editPageUpload" value="Upload"/>
+            </form>
+        </td>
     </table>
-    <input type="submit" id="editDone" onclick="postEditData()" value="Done">
+    <input type="submit" id="editDone" onclick="editAjax()" value="Done">
     <input type="submit" onclick="showMainPage()" value="go back to board">
 </div>
 <script type="text/javascript" src="boardScript.js"></script>

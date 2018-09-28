@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../schemas/user');
 const Board = require('../schemas/board');
+const multer = require('multer');
 const connect = require('../schemas/index');
 connect();
 
@@ -22,12 +22,19 @@ function renderMainBoardPage(req, res, title) {
 }
 
 function editBoardItem(req, res) {
-    const updateData = {title:req.body.title, content:req.body.content};
-    Board.updateOne({userid:req.user.userid,number:parseInt(req.body.number)},{$set:updateData})
+    const updateData = {title:req.body.title, content:req.body.content, imageFileName:req.body.imageFileName};
+    Board.updateOne({userid:req.user.userid,number:req.body.number},{$set:updateData})
         .then((result)=>{
-            console.log('editBoardItem - result : ',result);
             renderMainBoardPage(req, res, 'edit complete!');
     });
+}
+
+function getFileName(req, res) {
+    Board.findOne({userid:req.user.userid, number:req.body.number})
+        .then((result) => {
+            console.log('getFileName ajax : ',result.imageFileName);
+            res.send(result.imageFileName);
+        });
 }
 
 function deleteBoardItem(req, res) {
@@ -39,7 +46,7 @@ function deleteBoardItem(req, res) {
 }
 
 function createBoardItem(req, res) {
-    const newArticle = new Board({number:0, userid:req.user.userid, title:req.body.title, content:req.body.content});
+    const newArticle = new Board({number:0, userid:req.user.userid, title:req.body.title, content:req.body.content, imageFileName:req.body.imageFileName});
     newArticle.save()
         .then((result) => {
             console.log('createBoardItem - result : ',result);
@@ -56,11 +63,31 @@ router.post('/board', ensureAuthenticated, (req, res, next) => {
     console.log('board post request', req.body);
     if (req.body.actiontype === 'edit') {
         editBoardItem(req, res);
+    } else if (req.body.actiontype === 'getImageFileName') {
+        getFileName(req, res);
     } else if (req.body.actiontype === 'delete') {
         deleteBoardItem(req, res);
     } else if (req.body.actiontype === 'create') {
         createBoardItem(req, res);
     }
 });
+
+const upload = multer({
+    storage : multer.diskStorage({
+        destination : function(req, file, callback) {
+            callback(null, 'images/');
+        },
+        filename : function(req, file, callback) {
+            callback(null, Date.now() + file.originalname);
+        }
+    }),
+});
+
+router.post('/board/upload/editTable', ensureAuthenticated, upload.single('editPageInputImage'), (req, res, next) => {
+    res.send(req.file);
+});
+router.post('/board/upload/createTable', ensureAuthenticated, upload.single('createPageInputImage'), (req, res, next) => {
+    res.send(req.file);
+})
 
 module.exports = router;

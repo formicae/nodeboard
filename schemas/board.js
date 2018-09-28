@@ -11,6 +11,10 @@ const boardSchema = new mongoose.Schema({
         required:true,
         index:true,
     },
+    imageFileName:{
+        type:String,
+        index:true,
+    },
     title:{
         type:String,
         index:true,
