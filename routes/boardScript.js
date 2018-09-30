@@ -1,87 +1,106 @@
 const userid = document.getElementById('boardTable').className;
 const cells = document.getElementById('boardTable').getElementsByTagName('tr');
-function editPageLoad(number, title, content){
-    document.getElementById('editTitleLabel').innerText = title;
-    document.getElementById('editContentLabel').innerText = content;
-    document.getElementById('editTable').dataset.number = number;
-    document.getElementById('editTable').dataset.title = title;
-    document.getElementById('editTable').dataset.content = content;
+const allTables = document.getElementsByTagName('table');
+class Table {
+    constructor(name) {
+        this.name = name;
+        this.labels = {};
+        this.inputs = {};
+    }
+    setData(dataset) { this.data = dataset; }
+    setLabels(param, label) { this.labels[param] = label; }
+    setInputs(param, input) { this.inputs[param] = input; }
+    setImage(image) { this.image = image; }
+}
+const boardTable = new Table('board');
+const editTable = new Table('edit');
+const articleTable = new Table('article');
+const createTable = new Table('create');
+const tempTableArray = [boardTable, articleTable, createTable, editTable];
+for (let i=0; i<allTables.length; i++) {
+    const tempTable = tempTableArray[i];
+    let tempLabel = allTables[i].getElementsByTagName('label');
+    let tempInputs = allTables[i].getElementsByTagName('input');
+    tempTable.setData(allTables[i].dataset);
+    tempTable.setImage(allTables[i].getElementsByTagName('img')[0]);
+    for (let k=0; k<tempLabel.length; k++) {
+        tempTable.setLabels(tempLabel[k].className, tempLabel[k]);
+    }
+    for (let j=0; j<tempInputs.length; j++) {
+        if (tempInputs[j].type === 'text') {
+            tempTable.setInputs(tempInputs[j].name, tempInputs[j]);
+        }
+    }
+}
+function createNewAjax(data, callback) {
     const xhr = new XMLHttpRequest();
-    const data = {title:title, content:content, number:number, actiontype:'getImageFileName'};
     xhr.addEventListener('load', () => {
+        callback(xhr);
+    });
+    xhr.open('post','/board', true);
+    xhr.setRequestHeader('Content-Type','application/json');
+    xhr.send(JSON.stringify(data));
+}
+function editPageLoad(number, title, content){
+    editTable.labels.title.innerText = title;
+    editTable.labels.content.innerText = content;
+    editTable.data.number = number;
+    editTable.data.title = title;
+    editTable.data.content = content;
+    const data = {title:title, content:content, number:number, actiontype:'getImageFileName'};
+    createNewAjax(data, (xhr) => {
         renderImageFile('editImage', xhr.responseText);
         showEditPage();
     });
-    xhr.open('post','/board',true);
-    xhr.setRequestHeader('Content-Type','application/json');
-    xhr.send(JSON.stringify(data));
 }
 function deleteAjax(number, title, content){
-    const xhr = new XMLHttpRequest();
     const data = {title:title, content:content, number:number, actiontype:'delete'};
-    xhr.addEventListener('load', () => {
+    createNewAjax(data, (xhr) => {
         showMainPage();
         window.location.reload();
     });
-    xhr.open('post','/board',true);
-    xhr.setRequestHeader('Content-Type','application/json');
-    xhr.send(JSON.stringify(data));
 }
 function editAjax() {
-    const xhr = new XMLHttpRequest();
-    const number = document.getElementById('editTable').dataset.number;
-    const title = document.getElementById('editTitle').innerHTML || document.getElementById('editTitleLabel').innerHTML;
-    const content = document.getElementById('editContent').innerHTML || document.getElementById('editContentLabel').innerHTML;;
-    const imageFileName = !!document.getElementById('editTable').dataset.imageFileName ? document.getElementById('editImage').src : document.getElementById('editTable').dataset.imageFileName;
-    const data = {title:title, content:content, number:number, actiontype:'edit', imageFileName:imageFileName};
-    xhr.addEventListener('load', () => {
+    const data = {
+        title: editTable.inputs.title.value || editTable.data.title,
+        content: editTable.inputs.content.value || editTable.data.content,
+        number: editTable.data.number,
+        actiontype: 'edit',
+        imageFileName: editTable.image.src,
+    };
+    createNewAjax(data, (xhr) => {
         showMainPage();
         window.location.reload();
     });
-    xhr.open('post','/board', true);
-    xhr.setRequestHeader('Content-Type','application/json');
-    xhr.send(JSON.stringify(data));
 }
 function createAjax() {
-    const xhr = new XMLHttpRequest();
-    const title = document.getElementById('createTitle').value;
-    const content = document.getElementById('createContent').value;
-    const imageFileName = document.getElementById('createTable').dataset.imageFileName;
-    const data = {title:title, content:content, actiontype:'create', imageFileName:imageFileName};
-    xhr.addEventListener('load', () => {
+    const data = {
+        title : createTable.inputs.title.value,
+        content : createTable.inputs.content.value,
+        actiontype : 'create',
+        imageFileName : createTable.image.src,
+    };
+    createNewAjax(data, (xhr) => {
         showMainPage();
         window.location.reload();
     });
-    xhr.open('post','/board', true);
-    xhr.setRequestHeader('Content-Type','application/json');
-    xhr.send(JSON.stringify(data));
 }
 function renderImageFile(imageTagId, fileName){
-    if (!!fileName) {
-        document.getElementById(imageTagId).width = 250;
-        document.getElementById(imageTagId).height = 300;
-        document.getElementById(imageTagId).src = fileName;
-        document.getElementById(imageTagId+'Label').innerHTML = "Image : ";
-    } else {
-        document.getElementById(imageTagId).width = 0;
-        document.getElementById(imageTagId).height = 0;
-        document.getElementById(imageTagId).src = "";
-        document.getElementById(imageTagId+'Label').innerHTML = "";
-    }
+    const image = document.getElementById(imageTagId);
+    image.width = !!fileName ? 250 : 0;
+    image.height = !!fileName ? 300 : 0;
+    image.src = !!fileName ? fileName : "";
+    document.getElementById(imageTagId+'Label').innerText = !!fileName ? "Image : " : "";
 }
 function detailAjax(number, title, content) {
-    const xhr = new XMLHttpRequest();
     const data = {title:title, content:content, number:number, actiontype:'getImageFileName'};
-    xhr.addEventListener('load', () => {
-        document.getElementById('articleTable').dataset.number = number;
-        document.getElementById('articleTitle').innerHTML = title;
-        document.getElementById('articleContent').innerHTML = content;
+    createNewAjax(data, (xhr) => {
+        articleTable.data.number = number;
+        articleTable.labels.title.innerText = title;
+        articleTable.labels.content.innerText = content;
         renderImageFile('articleImage', xhr.responseText);
         showArticlePage();
     });
-    xhr.open('post','/board', true);
-    xhr.setRequestHeader('Content-Type','application/json');
-    xhr.send(JSON.stringify(data));
 }
 for (let i=1,len=cells.length; i<len; i++) {
     const innerCells = cells[i].getElementsByTagName('td');
@@ -99,17 +118,11 @@ for (let i=1,len=cells.length; i<len; i++) {
     });
 }
 function articleToEditPage(){
-    const number = document.getElementById('articleTable').dataset.number;
-    const title = document.getElementById('articleTitle').innerHTML;
-    const content = document.getElementById('articleContent').innerHTML;
-    editPageLoad(number, title, content);
+    editPageLoad(articleTable.data.number, articleTable.labels.title.innerText, articleTable.labels.content.innerText);
     showEditPage();
 }
 function articleToDelete(){
-    const number = document.getElementById('articleTable').dataset.number;
-    const title = document.getElementById('articleTitle').innerHTML;
-    const content = document.getElementById('articleContent').innerHTML;
-    deleteAjax(number, title, content);
+    deleteAjax(articleTable.data.number, articleTable.labels.title.innerText, articleTable.labels.content.innerText);
 }
 function pageConfig(inp1, inp2, inp3, inp4){
     document.querySelector('#mainBoardPage').className = inp1;
@@ -136,7 +149,6 @@ function imageUpload(inputForm, inputButton, targetTable, imageTag){
         const xhr = new XMLHttpRequest();
         xhr.addEventListener('load', () => {
             if (!!xhr.responseText) {
-                document.getElementById(targetTable).dataset.imageFileName = JSON.parse(xhr.responseText).filename;
                 renderImageFile(imageTag, JSON.parse(xhr.responseText).filename);
             }
         });

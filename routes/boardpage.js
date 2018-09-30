@@ -32,15 +32,13 @@ function editBoardItem(req, res) {
 function getFileName(req, res) {
     Board.findOne({userid:req.user.userid, number:req.body.number})
         .then((result) => {
-            console.log('getFileName ajax : ',result.imageFileName);
-            res.send(result.imageFileName);
+            res.send(result.imageFileName || "");
         });
 }
 
 function deleteBoardItem(req, res) {
     Board.remove({userid:req.user.userid, number:req.body.number})
         .then((result) => {
-            console.log('deleteBoardItem - after remove', result);
             renderMainBoardPage(req, res, 'delete complete!');
     }).catch((err) => {console.log('error occured in deleteBoardItem : ',err)});
 }
@@ -49,18 +47,15 @@ function createBoardItem(req, res) {
     const newArticle = new Board({number:0, userid:req.user.userid, title:req.body.title, content:req.body.content, imageFileName:req.body.imageFileName});
     newArticle.save()
         .then((result) => {
-            console.log('createBoardItem - result : ',result);
             renderMainBoardPage(req, res, 'create complete!');
         });
 }
 
 router.get('/board', ensureAuthenticated, (req, res, next) => {
-    console.log('/board - ',req.headers.actiontype);
     renderMainBoardPage(req, res, 'You can make your own articles!');
 });
 
 router.post('/board', ensureAuthenticated, (req, res, next) => {
-    console.log('board post request', req.body);
     if (req.body.actiontype === 'edit') {
         editBoardItem(req, res);
     } else if (req.body.actiontype === 'getImageFileName') {

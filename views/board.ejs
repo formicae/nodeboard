@@ -46,15 +46,18 @@
     </form>
 </div>
 <div id="articlePage" class="hidePage">
+    <p>Edit Article!</p>
     <table id="articleTable">
         <tr>
-            <td><h5 id="articleTitle"></h5></td>
+            <td><p>Title</p></td>
+            <td><label id="articleTitle" class="title"></label></td>
         </tr>
         <tr>
-            <td><h5 id="articleContent"></h5></td>
+            <td><p>Content</p></td>
+            <td><label id="articleContent" class="content"></label></td>
         </tr>
         <tr>
-            <td><label id="articleImageLabel"></label></td>
+            <td><label id="articleImageLabel" class="image"></label></td>
             <img id="articleImage" width="0" height="0">
         </tr>
         <tr>
@@ -72,16 +75,16 @@
     <h1><%= title %></h1>
     <p>Create Article <%=userid%>!</p>
     <table id="createTable">
-        <tr>
-            <td><label>Title</label></td>
-            <td><input type="text" id="createTitle" name="title"></td>
-        </tr>
-        <tr>
-            <td><label>Content</label></td>
-            <td><input type="text" id="createContent" name="content"></td>
-        </tr>
-        <tr>
-            <td><label id="createImageLabel"></label></td>
+        <div>
+            <td><p>Title</p></td>
+            <td><input type="text" id="createTitle" name="title" class="title"></td>
+        </div>
+        <div>
+            <td><p>Content</p></td>
+            <td><input type="text" id="createContent" name="content" class="content"></td>
+        </div>
+        <div>
+            <td><label id="createImageLabel" class="image"></label></td>
             <td><img id="createImage" width="0" height="0"></td>
             <td>
                 <form id="createPageImageUpload" enctype="multipart/form-data" action="/board/upload" method="post">
@@ -89,7 +92,7 @@
                     <input type="button" name="submit" id="createPageUpload" value="Upload"/>
                 </form>
             </td>
-        </tr>
+        </div>
     </table>
     <input type="submit" onclick="createAjax()" value="Done">
     <input type="submit" onclick="showMainPage()" value="go back to board">
@@ -97,34 +100,35 @@
 <div id="editBoardPage" class="hidePage">
     <h1><%= title %></h1>
     <p>Create Article <%=userid%>!</p>
-
     <table id="editTable">
         <tr>
-            <td><label>Previous Title</label></td>
-            <td><label id="editTitleLabel">None</label></td>
+            <td><p>Previous Title</p></td>
+            <td><label id="editTitleLabel" class="title"></label></td>
         </tr>
         <tr>
-            <td><label>Previous content</label></td>
-            <td><label id="editContentLabel">None</label></td>
+            <td><p>Previous content</p></td>
+            <td><label id="editContentLabel" class="content"></label></td>
         </tr>
         <tr>
-            <td><label>Title</label></td>
+            <td><p>Title</p></td>
             <td><input type="text" name="title" id="editTitle"></td>
         </tr>
         <tr>
-            <td><label>Content</label></td>
+            <td><p>Content</p></td>
             <td><input type="text" name="content" id="editContent"></td>
         </tr>
         <tr>
-            <td><label id="editImageLabel"></label></td>
+            <td><label id="editImageLabel" class="image"></label></td>
             <td><img id="editImage" width="0" height="0"></td>
         </tr>
-        <td>
-            <form id="editPageImageUpload" enctype="multipart/form-data" action="/board/upload" method="post">
-                <input type="file" name="editPageInputImage" multiple />
-                <input type="button" name="submit" id="editPageUpload" value="Upload"/>
-            </form>
-        </td>
+        <tr>
+            <td>
+                <form id="editPageImageUpload" enctype="multipart/form-data" action="/board/upload" method="post">
+                    <input type="file" name="editPageInputImage" multiple />
+                    <input type="button" name="submit" id="editPageUpload" value="Upload"/>
+                </form>
+            </td>
+        </tr>
     </table>
     <input type="submit" id="editDone" onclick="editAjax()" value="Done">
     <input type="submit" onclick="showMainPage()" value="go back to board">
