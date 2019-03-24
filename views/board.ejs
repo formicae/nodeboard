@@ -16,27 +16,19 @@
     <h2>Welcome to <%= userid %>'s board!</h2>
     <table id="boardTable" width="100%" border="1" class="<%=userid%>">
         <tr>
-            <th>number</th>
+            <!--<th>number</th>-->
             <th>title</th>
-            <th>text</th>
-            <th>detail</th>
+            <th>content</th>
+            <!--<th>detail</th>-->
             <th>EDIT</th>
             <th>DELETE</th>
         </tr>
         <% data.forEach(function (article) {%>
             <tr>
-                <td><%= article.number %></td>
-                <td><%= article.title %></td>
-                <td><%= article.content %></td>
-                <td>
-                    <input type="button" id="detail<%=article.number%>" value="detail">
-                </td>
-                <td>
-                    <input type="button" id="edit<%=article.number%>" value="edit">
-                </td>
-                <td>
-                    <input type="button" id="delete<%=article.number%>" value="delete">
-                </td>
+                <td class="<%= article._id%>"><%= article.title %></td>
+                <td class="<%= article._id%>"><%= article.content %></td>
+                <td class="<%= article._id%>"><input type="button" id="edit<%=article._id%>" value="edit"></td>
+                <td class="<%= article._id%>"><input type="button" id="delete<%=article._id%>" value="delete"></td>
             </tr>
         <% }); %>
     </table>
@@ -46,91 +38,50 @@
     </form>
 </div>
 <div id="articlePage" class="hidePage">
-    <p>Edit Article!</p>
-    <table id="articleTable">
-        <tr>
-            <td><p>Title</p></td>
-            <td><label id="articleTitle" class="title"></label></td>
-        </tr>
-        <tr>
-            <td><p>Content</p></td>
-            <td><label id="articleContent" class="content"></label></td>
-        </tr>
-        <tr>
-            <td><label id="articleImageLabel" class="image"></label></td>
-            <img id="articleImage" width="0" height="0">
-        </tr>
-        <tr>
-            <td><input type="button" onclick="articleToEditPage()" value="edit contents"></td>
-        </tr>
-        <tr>
-            <td><input type="button" onclick="articleToDelete()" value="delete contents"></td>
-        </tr>
-        <tr>
-            <td><input type="button" onclick="showMainPage()" value="go back to main page"></td>
-        </tr>
-    </table>
+    <span>Edit Article!</span>
+    <form id="articleForm" enctype="multipart/form-data" method="post">
+        Title<br>
+        <input type="text" name="title" readonly="readonly"><br>
+        Content<br>
+        <input type="text" name="content" readonly="readonly"><br>
+        <input type="text" name="image" readonly="readonly"><br>
+        <!--<span id="articleTitle" name="title" class="title"></span><br>-->
+        <!--<span id="articleContent" name="content" class="content"></span><br>-->
+        <!--<span id="articleImageText" name="image" class="image"></span><br>-->
+        <img id="articleImage" width="0" height="0"><br>
+        <input type="button" onclick="articleToEditPage()" value="edit contents"><br>
+        <input type="button" onclick="articleToDelete()" value="delete contents"><br>
+        <input type="button" onclick="showMainPage()" value="go back to main page"><br>
+    </form>
 </div>
 <div id="createBoardPage" class="hidePage">
     <h1><%= title %></h1>
-    <p>Create Article <%=userid%>!</p>
-    <table id="createTable">
-        <div>
-            <td><p>Title</p></td>
-            <td><input type="text" id="createTitle" name="title" class="title"></td>
-        </div>
-        <div>
-            <td><p>Content</p></td>
-            <td><input type="text" id="createContent" name="content" class="content"></td>
-        </div>
-        <div>
-            <td><label id="createImageLabel" class="image"></label></td>
-            <td><img id="createImage" width="0" height="0"></td>
-            <td>
-                <form id="createPageImageUpload" enctype="multipart/form-data" action="/board/upload" method="post">
-                    <input type="file" name="createPageInputImage" multiple />
-                    <input type="button" name="submit" id="createPageUpload" value="Upload"/>
-                </form>
-            </td>
-        </div>
-    </table>
-    <input type="submit" onclick="createAjax()" value="Done">
+    <span>Create Article <%=userid%>!</span>
+    <form id="createForm" enctype="multipart/form-data" method="post">
+        Title<br>
+        <input type="text" name="title"><br>
+        Content<br>
+        <input type="text" name="content"><br>
+
+        <span id="createImageText"></span><br>
+        <img id="createImage" width="0" height="0"><br>
+        <input type="file" name="createPageInputImage" id="createImgInput" multiple /><br>
+        <input type="button" name="submit" id="createFormSubmit" value="submit"/>
+    </form>
     <input type="submit" onclick="showMainPage()" value="go back to board">
 </div>
 <div id="editBoardPage" class="hidePage">
-    <h1><%= title %></h1>
-    <p>Create Article <%=userid%>!</p>
-    <table id="editTable">
-        <tr>
-            <td><p>Previous Title</p></td>
-            <td><label id="editTitleLabel" class="title"></label></td>
-        </tr>
-        <tr>
-            <td><p>Previous content</p></td>
-            <td><label id="editContentLabel" class="content"></label></td>
-        </tr>
-        <tr>
-            <td><p>Title</p></td>
-            <td><input type="text" name="title" id="editTitle"></td>
-        </tr>
-        <tr>
-            <td><p>Content</p></td>
-            <td><input type="text" name="content" id="editContent"></td>
-        </tr>
-        <tr>
-            <td><label id="editImageLabel" class="image"></label></td>
-            <td><img id="editImage" width="0" height="0"></td>
-        </tr>
-        <tr>
-            <td>
-                <form id="editPageImageUpload" enctype="multipart/form-data" action="/board/upload" method="post">
-                    <input type="file" name="editPageInputImage" multiple />
-                    <input type="button" name="submit" id="editPageUpload" value="Upload"/>
-                </form>
-            </td>
-        </tr>
-    </table>
-    <input type="submit" id="editDone" onclick="editAjax()" value="Done">
+    <span>Edit Article <%=userid%>!</span>
+    <form id="editForm" enctype="multipart/form-data" method="post">
+        Title<br>
+        <input type="text" name="title"><br>
+        Content<br>
+        <input type="textarea" name="content"><br>
+        <input type="text" name="image" readonly="readonly"><br>
+        <img id="editImage" class="" width="0" height="0"><br>
+        <input type="file" name="editPageInputImage" id="editImgInput" multiple /><br>
+        <input type="button" name="submit" id="editFormSubmit" value="submit"/>
+    </form>
     <input type="submit" onclick="showMainPage()" value="go back to board">
 </div>
 <script type="text/javascript" src="boardScript.js"></script>

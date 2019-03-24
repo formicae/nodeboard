@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const app = express();
 const passport = require('passport');
+const passportOAUTH = require('passport-google-oauth20');
 const indexRouter = require('./routes/index');
 const boardRouter = require('./routes/boardpage');
 const connect = require('./schemas/index');

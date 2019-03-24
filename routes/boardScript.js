@@ -1,37 +1,8 @@
 const userid = document.getElementById('boardTable').className;
 const cells = document.getElementById('boardTable').getElementsByTagName('tr');
-const allTables = document.getElementsByTagName('table');
-class Table {
-    constructor(name) {
-        this.name = name;
-        this.labels = {};
-        this.inputs = {};
-    }
-    setData(dataset) { this.data = dataset; }
-    setLabels(param, label) { this.labels[param] = label; }
-    setInputs(param, input) { this.inputs[param] = input; }
-    setImage(image) { this.image = image; }
-}
-const boardTable = new Table('board');
-const editTable = new Table('edit');
-const articleTable = new Table('article');
-const createTable = new Table('create');
-const tempTableArray = [boardTable, articleTable, createTable, editTable];
-for (let i=0; i<allTables.length; i++) {
-    const tempTable = tempTableArray[i];
-    let tempLabel = allTables[i].getElementsByTagName('label');
-    let tempInputs = allTables[i].getElementsByTagName('input');
-    tempTable.setData(allTables[i].dataset);
-    tempTable.setImage(allTables[i].getElementsByTagName('img')[0]);
-    for (let k=0; k<tempLabel.length; k++) {
-        tempTable.setLabels(tempLabel[k].className, tempLabel[k]);
-    }
-    for (let j=0; j<tempInputs.length; j++) {
-        if (tempInputs[j].type === 'text') {
-            tempTable.setInputs(tempInputs[j].name, tempInputs[j]);
-        }
-    }
-}
+const editForm = document.getElementById('editForm')
+    ,createForm = document.getElementById('createForm')
+    ,articleForm = document.getElementById('articleForm');
 function createNewAjax(data, callback) {
     const xhr = new XMLHttpRequest();
     xhr.addEventListener('load', () => {
@@ -41,88 +12,64 @@ function createNewAjax(data, callback) {
     xhr.setRequestHeader('Content-Type','application/json');
     xhr.send(JSON.stringify(data));
 }
-function editPageLoad(number, title, content){
-    editTable.labels.title.innerText = title;
-    editTable.labels.content.innerText = content;
-    editTable.data.number = number;
-    editTable.data.title = title;
-    editTable.data.content = content;
-    const data = {title:title, content:content, number:number, actiontype:'getImageFileName'};
+function editPageLoad(boardId, title, content){
+    editForm.dataset.boardId = boardId;
+    editForm.title.value = title;
+    editForm.content.value = content;
+    const data = {title:editForm.title.value, content:editForm.content.value, boardId:boardId, actiontype:'getImageFileName'};
     createNewAjax(data, (xhr) => {
-        renderImageFile('editImage', xhr.responseText);
+        renderImageFile('editImage', xhr.responseText, editForm);
         showEditPage();
     });
 }
-function deleteAjax(number, title, content){
-    const data = {title:title, content:content, number:number, actiontype:'delete'};
+function deleteAjax(boardId, title, content){
+    const data = {title:title, content:content, boardId:boardId, actiontype:'delete'};
     createNewAjax(data, (xhr) => {
         showMainPage();
         window.location.reload();
     });
 }
-function editAjax() {
-    const data = {
-        title: editTable.inputs.title.value || editTable.data.title,
-        content: editTable.inputs.content.value || editTable.data.content,
-        number: editTable.data.number,
-        actiontype: 'edit',
-        imageFileName: editTable.image.src,
-    };
-    createNewAjax(data, (xhr) => {
-        showMainPage();
-        window.location.reload();
-    });
-}
-function createAjax() {
-    const data = {
-        title : createTable.inputs.title.value,
-        content : createTable.inputs.content.value,
-        actiontype : 'create',
-        imageFileName : createTable.image.src,
-    };
-    createNewAjax(data, (xhr) => {
-        showMainPage();
-        window.location.reload();
-    });
-}
-function renderImageFile(imageTagId, fileName){
+function renderImageFile(imageTagId, fileName, form){
     const image = document.getElementById(imageTagId);
     image.width = !!fileName ? 250 : 0;
     image.height = !!fileName ? 300 : 0;
     image.src = !!fileName ? fileName : "";
-    document.getElementById(imageTagId+'Label').innerText = !!fileName ? "Image : " : "";
+    form.image.value = !!fileName ? "Image : " : "";
 }
-function detailAjax(number, title, content) {
-    const data = {title:title, content:content, number:number, actiontype:'getImageFileName'};
+function detailAjax(boardId, title, content) {
+    const data = {title:title, content:content, boardId:boardId, actiontype:'getImageFileName'};
     createNewAjax(data, (xhr) => {
-        articleTable.data.number = number;
-        articleTable.labels.title.innerText = title;
-        articleTable.labels.content.innerText = content;
-        renderImageFile('articleImage', xhr.responseText);
+        articleForm.dataset.boardId = boardId;
+        articleForm.title.value = title;
+        articleForm.content.value = content;
+        renderImageFile('articleImage', xhr.responseText, articleForm);
         showArticlePage();
     });
 }
 for (let i=1,len=cells.length; i<len; i++) {
     const innerCells = cells[i].getElementsByTagName('td');
-    const number = innerCells[0].innerText
-        ,title = innerCells[1].innerText
-        ,content = innerCells[2].innerText;
-    document.getElementById('edit'+number).addEventListener('click', () => {
-        editPageLoad(number, title, content);
+    const title = innerCells[0].innerText
+        ,content = innerCells[1].innerText
+        ,boardId = innerCells[0].className;
+    innerCells[0].addEventListener('click', () => {
+        detailAjax(boardId, title, content);
     });
-    document.getElementById('delete'+number).addEventListener('click', () => {
-        deleteAjax(number, title, content);
+    innerCells[1].addEventListener('click', () => {
+        detailAjax(boardId, title, content);
     });
-    document.getElementById('detail'+number).addEventListener('click', () =>{
-        detailAjax(number, title, content);
+    document.getElementById('edit'+boardId).addEventListener('click', () => {
+        editPageLoad(boardId, title, content);
+    });
+    document.getElementById('delete'+boardId).addEventListener('click', () => {
+        deleteAjax(boardId, title, content);
     });
 }
 function articleToEditPage(){
-    editPageLoad(articleTable.data.number, articleTable.labels.title.innerText, articleTable.labels.content.innerText);
+    editPageLoad(articleForm.dataset.boardId, articleForm.title.innerText, articleForm.content.innerText);
     showEditPage();
 }
 function articleToDelete(){
-    deleteAjax(articleTable.data.number, articleTable.labels.title.innerText, articleTable.labels.content.innerText);
+    deleteAjax(articleForm.dataset.boardId, articleForm.title.innerText, articleForm.content.innerText);
 }
 function pageConfig(inp1, inp2, inp3, inp4){
     document.querySelector('#mainBoardPage').className = inp1;
@@ -142,19 +89,32 @@ function showEditPage(){
 function showArticlePage(){
     pageConfig('hidePage', 'hidePage', 'hidePage', 'showPage');
 }
-function imageUpload(inputForm, inputButton, targetTable, imageTag){
+function formDataAjax(inputForm, inputButton, targetPath){
     document.getElementById(inputButton).addEventListener('click', () => {
-        const form = document.getElementById(inputForm);
-        const formData = new FormData(form);
+        const formData = new FormData(inputForm);
+        formData.append('boardId', inputForm.dataset.boardId);
         const xhr = new XMLHttpRequest();
         xhr.addEventListener('load', () => {
-            if (!!xhr.responseText) {
-                renderImageFile(imageTag, JSON.parse(xhr.responseText).filename);
-            }
+            showMainPage();
+            window.location.reload();
         });
-        xhr.open('post', '/board/upload/'+targetTable, true);
+        xhr.open('post', targetPath, true);
         xhr.send(formData);
     });
 }
-imageUpload('createPageImageUpload', 'createPageUpload', 'createTable', 'createImage');
-imageUpload('editPageImageUpload', 'editPageUpload', 'editTable', 'editImage');
+function onImageChange(inputFileTag, imageTag, form) {
+    document.getElementById(inputFileTag).onchange = (event) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(event.srcElement.files[0]);
+        reader.onload = function () {
+            var fileContent = reader.result;
+            renderImageFile(imageTag, fileContent, form);
+        }
+    }
+}
+formDataAjax(editForm, 'editFormSubmit', '/board/upload/edit');
+formDataAjax(createForm,'createFormSubmit','/board/upload/create');
+window.addEventListener('load', function() {
+    onImageChange('createImgInput', 'createImage', createForm);
+    onImageChange('editImgInput', 'editImage', editForm);
+});
